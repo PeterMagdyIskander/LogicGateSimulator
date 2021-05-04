@@ -25,71 +25,37 @@ public class LogicGates {
     public static void main(String[] args) {
         // TODO code application logic here
         circuit c=new circuit();
-        Pair left=new Pair <>(false,true);
-        Pair right=new Pair <>(false,true);
+        Pair left=new Pair <>(true,true);
+        Pair right=new Pair <>(true,true);
         Gate g=new Gate("and",left,right,1,0,"front");
-        c.makeRoot(g); 
-        
-        left=new Pair <>(true,true);
-        right=new Pair <>(false,true);
+        c.makeRoot(g);
+
+        left=new Pair <>(true,false);
+        right=new Pair <>(true,false);
         g=new Gate("and",left,right,2,1,"back");
         c.addGate(g);
-        
-       left=new Pair <>(true,true);
-        right=new Pair <>(true,true);
-        g=new Gate("and",left,right,3,2,"back");
-        c.addGate(g);
-        
-        left=new Pair <>(true,true);
-        right=new Pair <>(true,true);
-        g=new Gate("and",left,right,4,3,"front");
-        c.addGate(g);
-        left=new Pair <>(true,true);
-        right=new Pair <>(false,true);
-        g=new Gate("and",left,right,5,3,"back");
-        c.addGate(g);
-        
-        left=new Pair <>(false,true);
-        right=new Pair <>(true,true);
-        g=new Gate("and",left,right,6,4,"front");
+
+        left=new Pair <>(true,false);
+        right=new Pair <>(true,false);
+        g=new Gate("and",left,right,3,1,"back");
+
         c.addGate(g);
 
-        left=new Pair <>(false,true);
-        right=new Pair <>(true,true);
-        g=new Gate("and",left,right,7,4,"front");
-        c.addGate(g);
-
-        left=new Pair <>(false,true);
-        right=new Pair <>(true,true);
-        g=new Gate("and",left,right,8,7,"front");
-        c.addGate(g);
-        left=new Pair <>(false,true);
-        right=new Pair <>(true,true);
-        g=new Gate("and",left,right,9,8,"front");
-        c.addGate(g);
-        left=new Pair <>(false,true);
-        right=new Pair <>(true,true);
-        g=new Gate("and",left,right,10,6,"front");
-        c.addGate(g);
-        
-        left=new Pair <>(false,true);
-        right=new Pair <>(true,true);
-        g=new Gate("and",left,right,11,2,"front");
-        c.addGate(g);
-        left=new Pair <>(true,true);
-        right=new Pair <>(false,true);
-        g=new Gate("and",left,right,12,1,"front");
-        c.addGate(g);
-        left=new Pair <>(true,true);
-        right=new Pair <>(false,true);
-        g=new Gate("and",left,right,13,1,"front");
-        c.addGate(g);
-        
         c.finalBool(c.root);
     }
-    
 }
+/*
+    HOW TO ADD:
+    EACH GATE HAS CONNECTION TYPE:
+                                    FRONT: WILL BE ADDED IN THE BACK OF ANOTHER NODE, SO IT'S UP WILL BE CONNECTED
 
+                                    BACK:  WILL BE ADDED IN THE FRONT OF ANOTHER GATE, SO ITS LEFT OR RIGHT WILL BE CONNECTED
+
+
+                                    PAIRS : FIRST BOOLEAN IS TRUE THEN IT CAN BE CONNECTED TO SOMETHING
+                                            SECOND BOOLEAN IS THE ACTUAL VALUE IF ITS NOT CONNECTED
+
+*/
 class Gate{
     String name;
     Pair <Boolean,Boolean>left;
@@ -128,10 +94,11 @@ class circuit{
         circuitNode temp=root;
         circuitNode newNode=new circuitNode(gate);
         while(true){
-            if(newNode.gate.connectionType.equals("back")){
+            if(newNode.gate.connectionType.equals("back")){ //if this node is connected from behind
+
                 if(newNode.gate.connectedTo==temp.gate.ID){
                     temp.up=newNode;
-                    if(newNode.gate.left.getKey()){
+                    if(newNode.gate.left.getKey()){//if true then it can be connected
                         newNode.left=temp;
                         System.out.println("added gate : "+newNode.gate.ID+" to gate : "+temp.gate.ID);
                         break;
@@ -145,7 +112,7 @@ class circuit{
             else if(newNode.gate.connectionType.equals("front")){
                 while(temp.up!=null)
                     temp=temp.up;
-                
+
                 Stack<circuitNode> savePoint=new Stack<>();
                 ArrayList <Integer> visited=new ArrayList();
                 savePoint.add(temp);
@@ -176,7 +143,7 @@ class circuit{
                         break;
                     }
                 }
-                
+
             }
             temp=temp.up;
         }
@@ -188,7 +155,7 @@ class circuit{
             temp=temp.up;
         Stack<circuitNode> savePoint=new Stack<>();
         savePoint.push(temp);
-        while(!savePoint.isEmpty()){    
+        while(!savePoint.isEmpty()){
             temp=savePoint.peek();
             if(temp.left!=null&&!temp.left.hasValue&&temp.right==null){
                 System.out.println(temp.gate.ID);
@@ -212,7 +179,7 @@ class circuit{
                 if(!temp.gate.equals("not"))
                     temp.value=calculate(temp.gate.name,temp.left.value,temp.gate.right.getValue());
                 else{
-                     if(temp.left==null)
+                    if(temp.left==null)
                         temp.value=!temp.right.value;
                     else
                         temp.value=!temp.left.value;
@@ -225,10 +192,10 @@ class circuit{
                     if(temp.gate.equals("not"))
                         temp.value=calculate(temp.gate.name,temp.left.value,temp.right.value);
                     else{
-                         if(temp.left==null)
-                        temp.value=!temp.right.value;
-                    else
-                        temp.value=!temp.left.value;
+                        if(temp.left==null)
+                            temp.value=!temp.right.value;
+                        else
+                            temp.value=!temp.left.value;
                     }
                     temp=savePoint.pop();
                 }else if(temp.right.hasValue){
@@ -252,7 +219,7 @@ class circuit{
             if(input1==false&&input2==false){
                 return false;
             }else{
-                return input1&&input2;    
+                return input1&&input2;
             }
         }else if(name.equals("or")){
             return input1||input2;
@@ -264,7 +231,7 @@ class circuit{
             if(input1==true&&input2==true){
                 return false;
             }else{
-                return true;    
+                return true;
             }
         }
     }
